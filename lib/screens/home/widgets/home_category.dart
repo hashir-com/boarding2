@@ -152,7 +152,7 @@ class CategoryCard extends StatelessWidget {
                     child: Text(
                       offerText!,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.background,
                         fontSize: 8.sp,
                         fontWeight: FontWeight.bold,
                       ),

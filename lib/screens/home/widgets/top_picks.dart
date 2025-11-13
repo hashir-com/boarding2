@@ -89,7 +89,7 @@ class _TopPicksState extends State<TopPicks> {
                               height: 1.1,
                               fontSize: 20.sp, // Responsive font size
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: AppColors.background,
                             ),
                           ),
                           SizedBox(height: 12.h),

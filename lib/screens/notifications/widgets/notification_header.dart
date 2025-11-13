@@ -1,4 +1,4 @@
-// lib/screens/notifications/widgets/notification_app_bar.dart
+// lib/screens/notifications/widgets/notification_header.dart
 import 'package:btask/core/appcolors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,7 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class NotificationAppBar extends StatelessWidget implements PreferredSizeWidget {
+class NotificationAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
   const NotificationAppBar({super.key});
 
   @override
@@ -46,10 +47,7 @@ class NotificationAppBar extends StatelessWidget implements PreferredSizeWidget 
       ),
       title: Text(
         'Notifications',
-        style: GoogleFonts.quicksand(
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-        ),
+        style: GoogleFonts.quicksand(fontWeight: FontWeight.bold, fontSize: 20),
       ),
     );
   }

@@ -12,11 +12,15 @@ class ApiService {
   // Timeout duration for API calls
   static const Duration timeoutDuration = Duration(seconds: 30);
 
+  final http.Client _client;
+
+  ApiService({http.Client? client}) : _client = client ?? http.Client();
+
   /// Fetch notifications from API and parse using isolate
   Future<NotificationModel> fetchNotification() async {
     try {
       // Make HTTP GET request with timeout
-      final response = await http
+      final response = await _client
           .get(Uri.parse(apiUrl))
           .timeout(timeoutDuration);
 
@@ -83,26 +87,31 @@ class ApiService {
   }
 
   /// Optional: Retry mechanism for failed requests
+  /// maxRetries = total number of attempts (including the initial one)
   Future<NotificationModel> fetchNotificationWithRetry({
     int maxRetries = 3,
     Duration retryDelay = const Duration(seconds: 2),
   }) async {
-    int retryCount = 0;
+    Exception? lastException;
 
-    while (retryCount < maxRetries) {
+    // Try maxRetries times (including initial attempt)
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         return await fetchNotification();
       } catch (e) {
-        retryCount++;
-        if (retryCount >= maxRetries) {
-          // Max retries reached, throw the error
+        lastException = e as Exception;
+        
+        // If this was the last attempt, throw the error
+        if (attempt >= maxRetries) {
           rethrow;
         }
-        // Wait before retrying
+        
+        // Wait before next retry (but not after the last attempt)
         await Future.delayed(retryDelay);
       }
     }
 
-    throw Exception('Failed after $maxRetries retry attempts');
+    // This should never be reached, but just in case
+    throw lastException ?? Exception('Failed after $maxRetries attempts');
   }
 }

@@ -55,7 +55,7 @@ class CrazeDeals extends StatelessWidget {
                         style: GoogleFonts.quicksand(
                           fontSize: 18.sp,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: AppColors.background,
                         ),
                       ),
                     ),
@@ -68,7 +68,7 @@ class CrazeDeals extends StatelessWidget {
                             style: GoogleFonts.quicksand(
                               fontSize: 11.sp,
                               fontWeight: FontWeight.w500,
-                              color: Colors.white,
+                              color: AppColors.background,
                             ),
                           ),
                         ),
@@ -77,19 +77,19 @@ class CrazeDeals extends StatelessWidget {
                           style: GoogleFonts.quicksand(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white,
+                            color: AppColors.background,
                           ),
                         ),
                         Icon(
                           Icons.arrow_circle_right,
-                          color: Colors.white,
+                          color: AppColors.background,
                           size: 15.sp,
                         ),
                       ],
                     ),
                   ],
                 ),
-
+                SizedBox(width: 10.w),
                 SvgPicture.asset("assets/images/gift.svg"),
               ],
             ),

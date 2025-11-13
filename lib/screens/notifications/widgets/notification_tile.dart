@@ -25,20 +25,22 @@ class NotificationTile extends StatelessWidget {
     );
 
     // Generate a random SVG icon for this notification
-    // Note: This uses a seeded random based on index for consistency across rebuilds;
-    // if you want true randomness (changes on rebuild), remove the seed.
+    // This uses a seeded random based on index for consistency across rebuilds;
     final random = Random(
       index,
     ); // Seed with index for stable per-item randomness
     final randomIconPath = svgIcons[random.nextInt(svgIcons.length)];
 
     return ListTile(
-      leading: SvgPicture.asset(randomIconPath),
+      leading: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [SvgPicture.asset(randomIconPath)],
+      ),
       title: Text(
         notification.title,
         style: GoogleFonts.quicksand(
           fontWeight: FontWeight.w700,
-          fontSize: 18.sp,
+          fontSize: 15.sp,
         ),
       ),
       subtitle: Column(
@@ -47,7 +49,7 @@ class NotificationTile extends StatelessWidget {
           Text(
             notification.body,
             style: GoogleFonts.quicksand(
-              fontSize: 14.sp,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w400,
             ),
           ),

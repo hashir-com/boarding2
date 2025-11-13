@@ -44,7 +44,7 @@ class TimeAgoFormatter {
   }
 
   /// Alternative method that always shows the date for older notifications
-  /// Use this if you want to show actual dates for notifications older than 2 days
+  ///  to show actual dates for notifications older than 2 days
   static String formatTimeAgoOrDate(String timestamp) {
     try {
       final dateTime = DateTime.parse(timestamp);

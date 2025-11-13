@@ -1,39 +1,59 @@
+// lib/screens/notifications/widgets/notification_app_bar.dart
+import 'package:btask/core/appcolors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-AppBar notificationAppBar(BuildContext context) {
-  return AppBar(
-    leading: GestureDetector(
-      onTap: () => context.pop(),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0), // Mimics original padding for icon
-        child: SvgPicture.asset('assets/images/Group 597back.svg'),
+class NotificationAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const NotificationAppBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1.0), // Height of the line
+        child: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 1,
+                blurRadius: 1,
+                offset: const Offset(0, 2), // changes position of shadow
+              ),
+            ],
+          ),
+          height: 1,
+          // Or use decoration for BorderSide
+          // Alternative: decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey.shade300))),
+        ),
       ),
-    ),
-    title: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 18.0), // Matches original all-around padding, adjusted for title
-      child: Text(
+      toolbarHeight: 80.h,
+      leadingWidth: 50,
+      leading: GestureDetector(
+        onTap: () => context.pop(),
+        child: Padding(
+          padding: const EdgeInsets.only(
+            left: 16.0,
+            right: 0,
+            top: 15,
+            bottom: 15,
+          ),
+          child: SvgPicture.asset('assets/images/notback.svg'),
+        ),
+      ),
+      title: Text(
         'Notifications',
         style: GoogleFonts.quicksand(
-          fontSize: 20,
           fontWeight: FontWeight.bold,
+          fontSize: 20,
         ),
       ),
-    ),
-    bottom: PreferredSize(
-      preferredSize: const Size.fromHeight(2.0),
-      child: Container(
-        height: 2,
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Colors.grey.withOpacity(0.3)),
-          ),
-        ),
-      ),
-    ),
-    titleSpacing: 20.0, // Adds space between leading and title to match SizedBox(width: 20)
-    automaticallyImplyLeading: false, // Disable default back button since we're using custom leading
-  );
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 1.0);
 }

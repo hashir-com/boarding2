@@ -59,9 +59,9 @@ class _TopPicksState extends State<TopPicks> {
             controller: _pageController,
             itemCount: banners.length,
             onPageChanged: (int index) {
-              setState(() {
-                _currentPage = index;
-              });
+              // setState(() {
+              //   _currentPage = index;
+              // });
             },
             itemBuilder: (context, index) {
               final banner = banners[index];

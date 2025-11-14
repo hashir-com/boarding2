@@ -19,7 +19,8 @@ class NotificationAppBar extends StatelessWidget
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
+                // ignore: deprecated_member_use
+                color: AppColors.secondaryText.withOpacity(0.3),
                 spreadRadius: 1,
                 blurRadius: 1,
                 offset: const Offset(0, 2), // changes position of shadow

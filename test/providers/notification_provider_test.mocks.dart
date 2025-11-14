@@ -30,9 +30,9 @@ class _FakeNotificationModel_0 extends _i1.SmartFake
     : super(parent, parentInvocation);
 }
 
-/// A class which mocks [ApiService].
-///
-/// See the documentation for Mockito's code generation for more information.
+// A class which mocks [ApiService].
+//
+// See the documentation for Mockito's code generation for more information.
 class MockApiService extends _i1.Mock implements _i3.ApiService {
   MockApiService() {
     _i1.throwOnMissingStub(this);

@@ -1,16 +1,16 @@
-/// Widget tests for notification UI components
-///
-/// Widget tests verify individual UI components render correctly.
-/// Unlike integration tests (full screen), these test one widget at a time.
-///
-/// What we test:
-/// - 📱 UI components display correct data
-/// - 🎨 Widgets render without crashing
-/// - 🔄 Different states (loading, error, empty, success)
-/// - 📐 Widget structure and layout
-///
-/// We use mocks to control what data the widgets receive,
-/// making tests predictable and fast.
+// Widget tests for notification UI components
+//
+// Widget tests verify individual UI components render correctly.
+// Unlike integration tests (full screen), these test one widget at a time.
+//
+// What we test:
+// - UI components display correct data
+// - Widgets render without crashing
+// - Different states (loading, error, empty, success)
+// - Widget structure and layout
+//
+// We use mocks to control what data the widgets receive,
+// making tests predictable and fast.
 
 import 'package:btask/models/notification_model.dart';
 import 'package:btask/providers/notifications_provider.dart';

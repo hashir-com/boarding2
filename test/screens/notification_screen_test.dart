@@ -1,14 +1,14 @@
-/// Integration tests for NotificationScreen
-///
-/// Integration tests verify how different parts of the app work together.
-/// Unlike unit tests (which test one piece), these tests verify:
-/// - The screen displays correctly with real widgets
-/// - Data flows properly from Provider to UI
-/// - User interactions work as expected
-/// - Screen handles different states (loading, error, success)
-///
-/// We use "mocks" (fake versions) of the provider to control what data
-/// the screen receives, making tests predictable and fast.
+// Integration tests for NotificationScreen
+//
+// Integration tests verify how different parts of the app work together.
+// Unlike unit tests (which test one piece), these tests verify:
+// - The screen displays correctly with real widgets
+// - Data flows properly from Provider to UI
+// - User interactions work as expected
+// - Screen handles different states (loading, error, success)
+//
+// We use "mocks" (fake versions) of the provider to control what data
+// the screen receives, making tests predictable and fast.
 
 import 'package:btask/models/notification_model.dart';
 import 'package:btask/providers/notifications_provider.dart';
@@ -28,15 +28,15 @@ import 'package:mockito/annotations.dart';
 @GenerateMocks([NotificationProvider])
 import 'notification_screen_test.mocks.dart';
 
-/// FakeNotificationProvider - A test version of NotificationProvider
-///
-/// This extends the real NotificationProvider so it can be used with Provider package.
-/// Unlike mocks, this actually calls notifyListeners() so widgets rebuild properly.
-///
-/// Why we need this:
-/// - MockNotificationProvider doesn't trigger real widget rebuilds
-/// - We need to test that UI updates when provider state changes
-/// - This fake class lets us control state AND see real widget behavior
+// FakeNotificationProvider - A test version of NotificationProvider
+//
+// This extends the real NotificationProvider so it can be used with Provider package.
+// Unlike mocks, this actually calls notifyListeners() so widgets rebuild properly.
+//
+// Why we need this:
+// - MockNotificationProvider doesn't trigger real widget rebuilds
+// - We need to test that UI updates when provider state changes
+// - This fake class lets us control state AND see real widget behavior
 class FakeNotificationProvider extends NotificationProvider {
   bool _isLoading = false;
   String _errorMessage = '';
@@ -55,20 +55,20 @@ class FakeNotificationProvider extends NotificationProvider {
   // Track if fetch was called (useful for testing initialization)
   bool get fetchWasCalled => _fetchWasCalled;
 
-  /// Set loading state and notify widgets to rebuild
+  // Set loading state and notify widgets to rebuild
   void setLoading(bool value) {
     _isLoading = value;
     notifyListeners(); // This is what makes widgets update
   }
 
-  /// Set error message and notify widgets
+  // Set error message and notify widgets
   void setError(String message) {
     _errorMessage = message;
     _isLoading = false;
     notifyListeners();
   }
 
-  /// Set notifications data and notify widgets
+  // Set notifications data and notify widgets
   void setNotifications(List<NotificationItem> items) {
     _notifications = items;
     _isLoading = false;

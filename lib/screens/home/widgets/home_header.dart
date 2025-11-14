@@ -5,8 +5,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Header widget for the home screen
-/// Displays location, search bar, and action icons (notifications, tags)
+// Header widget for the home screen
+// Displays location, search bar, and action icons (notifications, tags)
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
 
@@ -18,7 +18,7 @@ class HomeHeader extends StatelessWidget {
       color: AppColors.background,
       child: Column(
         children: [
-          // Location section with location pin icon and dropdown indicator
+          // Location section with location icon and dropdown indicator
           Row(
             children: [
               SvgPicture.asset(

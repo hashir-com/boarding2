@@ -1,11 +1,10 @@
-/// Unit tests for NotificationModel and NotificationItem
-/// Verifies JSON parsing, serialization, null handling, and data integrity
+// Unit tests for NotificationModel and NotificationItem
+// Verifies JSON parsing, serialization, null handling, and data integrity
 import 'package:btask/models/notification_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('NotificationModel Tests', () {
-    
     // Sample valid JSON data matching the API response structure
     final validJson = {
       'message': 'Success',
@@ -21,8 +20,8 @@ void main() {
           'title': 'Test Notification 2',
           'body': 'Another test notification',
           'timestamp': '2024-11-13T11:45:00Z',
-        }
-      ]
+        },
+      ],
     };
 
     test('should parse valid JSON correctly', () {
@@ -35,10 +34,7 @@ void main() {
     });
 
     test('should handle empty data array', () {
-      final emptyDataJson = {
-        'message': 'No notifications',
-        'data': []
-      };
+      final emptyDataJson = {'message': 'No notifications', 'data': []};
 
       final model = NotificationModel.fromJson(emptyDataJson);
 
@@ -47,10 +43,7 @@ void main() {
     });
 
     test('should handle null data array gracefully', () {
-      final nullDataJson = {
-        'message': 'Success',
-        'data': null
-      };
+      final nullDataJson = {'message': 'Success', 'data': null};
 
       final model = NotificationModel.fromJson(nullDataJson);
 
@@ -67,8 +60,8 @@ void main() {
             'title': 'Test',
             'body': 'Body',
             'timestamp': '2024-11-13T10:00:00Z',
-          }
-        ]
+          },
+        ],
       };
 
       final model = NotificationModel.fromJson(noMessageJson);
@@ -101,7 +94,6 @@ void main() {
   });
 
   group('NotificationItem Tests', () {
-    
     final validItemJson = {
       'image': 'https://example.com/image.jpg',
       'title': 'Test Title',

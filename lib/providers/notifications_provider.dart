@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/notification_model.dart';
 import '../services/api_service.dart';
 
-/// Provider class for managing notification state across the app
-/// Handles fetching, storing, and updating notification data
+// Provider class for managing notification state across the app
+// Handles fetching, storing, and updating notification data
 class NotificationProvider extends ChangeNotifier {
   List<NotificationItem> _notifications = [];
   bool _isLoading = false;
@@ -16,9 +16,9 @@ class NotificationProvider extends ChangeNotifier {
 
   final ApiService _apiService = ApiService();
 
-  /// Fetches notifications from the API
-  /// Updates loading state and notifies listeners throughout the process
-  /// Handles errors and stores error messages if the request fails
+  // Fetches notifications from the API
+  // Updates loading state and notifies listeners throughout the process
+  // Handles errors and stores error messages if the request fails
   Future<void> fetchNotifications() async {
     // Set loading state
     _isLoading = true;

@@ -1,16 +1,16 @@
-/// Unit tests for ApiService
-///
-/// ApiService handles all communication with the backend server.
-/// These tests verify it works correctly in different scenarios:
-///
-/// -  Success: Data is fetched and parsed correctly
-/// -  Errors: 404, 500, 503 status codes are handled
-/// -  Network issues: Timeout, no internet connection
-/// -  Retry logic: Automatic retries when requests fail
-/// -  Edge cases: Empty responses, malformed JSON, large datasets
-///
-/// We use "mocks" (fake HTTP client) so tests don't make real network calls.
-/// This makes tests fast, reliable, and work without internet.
+// Unit tests for ApiService
+//
+// ApiService handles all communication with the backend server.
+// These tests verify it works correctly in different scenarios:
+//
+// -  Success: Data is fetched and parsed correctly
+// -  Errors: 404, 500, 503 status codes are handled
+// -  Network issues: Timeout, no internet connection
+// -  Retry logic: Automatic retries when requests fail
+// -  Edge cases: Empty responses, malformed JSON, large datasets
+//
+// We use "mocks" (fake HTTP client) so tests don't make real network calls.
+// This makes tests fast, reliable, and work without internet.
 
 import 'dart:async';
 import 'dart:collection';

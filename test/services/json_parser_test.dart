@@ -1,19 +1,19 @@
-/// Unit tests for JsonParser service
-///
-/// JsonParser uses Flutter Isolates to parse JSON on a background thread.
-/// This prevents the UI from freezing when processing large JSON responses.
-///
-/// What are Isolates?
-/// - Separate threads that run code in parallel
-/// - Don't block the main UI thread
-/// - Essential for keeping apps smooth and responsive
-///
-/// These tests verify:
-/// - ✅ Valid JSON is parsed correctly
-/// - 📦 Large datasets (50+ items) are handled efficiently
-/// - ❌ Malformed JSON throws clear errors
-/// - 🎯 Special characters (emojis, quotes, newlines) work
-/// - ⚡ Parsing completes within reasonable time limits
+// Unit tests for JsonParser service
+//
+// JsonParser uses Flutter Isolates to parse JSON on a background thread.
+// This prevents the UI from freezing when processing large JSON responses.
+//
+// What are Isolates?
+// - Separate threads that run code in parallel
+// - Don't block the main UI thread
+// - Essential for keeping apps smooth and responsive
+//
+// These tests verify:
+// - Valid JSON is parsed correctly
+// - Large datasets (50+ items) are handled efficiently
+// - Malformed JSON throws clear errors
+// - Special characters (emojis, quotes, newlines) work
+// - Parsing completes within reasonable time limits
 
 import 'package:btask/services/json_parser.dart';
 import 'package:btask/models/notification_model.dart';
@@ -232,4 +232,4 @@ void main() {
     });
   });
 }
-/// Unit tests for NotificationProvider
+// Unit tests for NotificationProvider

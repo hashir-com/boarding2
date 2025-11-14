@@ -1,8 +1,8 @@
-/// Helper class to format timestamps as "time ago" strings
+// Helper class to format timestamps as "time ago" strings
 class TimeAgoFormatter {
-  /// Converts a timestamp string to a relative time format
-  /// Returns null if the notification is older than 2 days (to hide the date)
-  /// Examples: "Just now", "5 mins ago", "2 hours ago", "1 day ago"
+  // Converts a timestamp string to a relative time format
+  // Returns null if the notification is older than 2 days (to hide the date)
+  // Examples: "Just now", "5 mins ago", "2 hours ago", "1 day ago"
   static String? formatTimeAgo(String timestamp) {
     try {
       final dateTime = DateTime.parse(timestamp);
@@ -43,8 +43,8 @@ class TimeAgoFormatter {
     }
   }
 
-  /// Alternative method that always shows the date for older notifications
-  ///  to show actual dates for notifications older than 2 days
+  // Alternative method that always shows the date for older notifications
+  //  to show actual dates for notifications older than 2 days
   static String formatTimeAgoOrDate(String timestamp) {
     try {
       final dateTime = DateTime.parse(timestamp);

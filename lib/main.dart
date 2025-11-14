@@ -1,4 +1,3 @@
-
 import 'package:btask/providers/notifications_provider.dart';
 import 'package:btask/routes.dart';
 
@@ -6,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
-/// Application entry point
-/// Initializes Flutter bindings and sets up the notification provider
-/// before running the app
+// Application entry point
+// Initializes Flutter bindings and sets up the notification provider
+// before running the app
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -20,8 +19,8 @@ void main() async {
   );
 }
 
-/// Root application widget
-/// Configures screen responsiveness, routing, and theming for the entire app
+// Root application widget
+// Configures screen responsiveness, routing, and theming for the entire app
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

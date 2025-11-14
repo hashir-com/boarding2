@@ -16,7 +16,7 @@ class ApiService {
 
   ApiService({http.Client? client}) : _client = client ?? http.Client();
 
-  /// Fetch notifications from API and parse using isolate
+  // Fetch notifications from API and parse using isolate
   Future<NotificationModel> fetchNotification() async {
     try {
       // Make HTTP GET request with timeout
@@ -74,7 +74,7 @@ class ApiService {
     }
   }
 
-  /// Optional: Method to check internet connectivity before making request
+  // Optional: Method to check internet connectivity before making request
   Future<bool> hasInternetConnection() async {
     try {
       final result = await InternetAddress.lookup(
@@ -86,8 +86,8 @@ class ApiService {
     }
   }
 
-  /// Optional: Retry mechanism for failed requests
-  /// maxRetries = total number of attempts (including the initial one)
+  // Optional: Retry mechanism for failed requests
+  // maxRetries = total number of attempts (including the initial one)
   Future<NotificationModel> fetchNotificationWithRetry({
     int maxRetries = 3,
     Duration retryDelay = const Duration(seconds: 2),
@@ -100,12 +100,12 @@ class ApiService {
         return await fetchNotification();
       } catch (e) {
         lastException = e as Exception;
-        
+
         // If this was the last attempt, throw the error
         if (attempt >= maxRetries) {
           rethrow;
         }
-        
+
         // Wait before next retry (but not after the last attempt)
         await Future.delayed(retryDelay);
       }

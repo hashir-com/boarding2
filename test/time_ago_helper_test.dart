@@ -1,16 +1,14 @@
-/// ============================================================================
-/// TimeAgoFormatter Tests
-/// ============================================================================
+// TimeAgoFormatter Tests
 
-/// Tests for TimeAgoFormatter utility class
-///
-/// This helper converts timestamps into human-readable relative time strings.
-/// Examples: "Just now", "5 mins ago", "3 hours ago", "1 day ago"
-///
-/// Why relative time?
-/// - More intuitive than exact timestamps
-/// - Users care more about "how long ago" than exact time
-/// - Common pattern in social apps, notifications, chat apps
+// Tests for TimeAgoFormatter utility class
+//
+// This helper converts timestamps into human-readable relative time strings.
+// Examples: "Just now", "5 mins ago", "3 hours ago", "1 day ago"
+//
+// Why relative time?
+// - More intuitive than exact timestamps
+// - Users care more about "how long ago" than exact time
+// - Common pattern in social apps, notifications, chat apps
 
 import 'package:btask/screens/notifications/time_ago_helper.dart';
 import 'package:flutter_test/flutter_test.dart';

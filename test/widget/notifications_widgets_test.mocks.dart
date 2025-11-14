@@ -26,9 +26,9 @@ import 'package:mockito/src/dummies.dart' as _i4;
 // ignore_for_file: subtype_of_sealed_class
 // ignore_for_file: invalid_use_of_internal_member
 
-/// A class which mocks [NotificationProvider].
-///
-/// See the documentation for Mockito's code generation for more information.
+// A class which mocks [NotificationProvider].
+//
+// See the documentation for Mockito's code generation for more information.
 class MockNotificationProvider extends _i1.Mock
     implements _i2.NotificationProvider {
   MockNotificationProvider() {

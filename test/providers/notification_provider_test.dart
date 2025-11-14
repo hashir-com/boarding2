@@ -1,13 +1,13 @@
-/// Unit tests for NotificationProvider
-///
-/// These tests verify the provider's state management capabilities:
-/// - Initial state values (empty lists, false flags)
-/// - Listener notification system (how widgets get updates)
-/// - State changes during API calls
-/// - Error handling behavior
-///
-/// Note: These are basic tests without API mocking - they test the provider's
-/// structure and state management rather than actual API responses
+// Unit tests for NotificationProvider
+//
+// These tests verify the provider's state management capabilities:
+// - Initial state values (empty lists, false flags)
+// - Listener notification system (how widgets get updates)
+// - State changes during API calls
+// - Error handling behavior
+//
+// Note: These are basic tests without API mocking - they test the provider's
+// structure and state management rather than actual API responses
 
 import 'package:btask/providers/notifications_provider.dart';
 import 'package:btask/models/notification_model.dart';

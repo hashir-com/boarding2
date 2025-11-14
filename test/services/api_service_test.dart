@@ -1,19 +1,20 @@
-// test/services/api_service_test.dart
-
 /// Unit tests for ApiService
 ///
-/// These tests verify:
-/// - Successful API calls return correct data
-/// - HTTP error codes are handled properly
-/// - Network errors (timeout, no internet) are caught
-/// - Retry mechanism works correctly
-/// - Edge cases (empty response, malformed data)
+/// ApiService handles all communication with the backend server.
+/// These tests verify it works correctly in different scenarios:
 ///
-/// Note: These tests use mocked HTTP responses to avoid actual network calls
+/// -  Success: Data is fetched and parsed correctly
+/// -  Errors: 404, 500, 503 status codes are handled
+/// -  Network issues: Timeout, no internet connection
+/// -  Retry logic: Automatic retries when requests fail
+/// -  Edge cases: Empty responses, malformed JSON, large datasets
+///
+/// We use "mocks" (fake HTTP client) so tests don't make real network calls.
+/// This makes tests fast, reliable, and work without internet.
 
 import 'dart:async';
-import 'dart:collection'; // For Queue
-import 'dart:io'; // For exceptions
+import 'dart:collection';
+import 'dart:io';
 import 'package:btask/services/api_service.dart';
 import 'package:btask/models/notification_model.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,21 +22,25 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-// Generate mocks using build_runner
-// Run: dart run build_runner build
+// Tell Mockito to generate a mock version of http.Client
+// Run this command to generate the mock: dart run build_runner build
 @GenerateMocks([http.Client])
 import 'api_service_test.mocks.dart';
 
 void main() {
   group('ApiService Tests', () {
+    // Variables we'll use in every test
     late ApiService apiService;
     late MockClient mockClient;
 
+    // setUp runs before each test to create fresh instances
+    // This prevents tests from interfering with each other
     setUp(() {
       mockClient = MockClient();
       apiService = ApiService(client: mockClient);
     });
 
+    // Sample valid JSON that matches our API's response format
     const validJsonResponse = '''
     {
       "message": "Success",
@@ -51,29 +56,31 @@ void main() {
     ''';
 
     test('should successfully fetch and parse notifications', () async {
-      // Arrange
+      // Tell mock client to return success response when API is called
       when(
         mockClient.get(any),
       ).thenAnswer((_) async => http.Response(validJsonResponse, 200));
 
-      // Act
+      // Call the API method
       final result = await apiService.fetchNotification();
 
-      // Assert
+      // Verify the response was parsed correctly into our model
       expect(result, isA<NotificationModel>());
       expect(result.message, equals('Success'));
       expect(result.data.length, equals(1));
       expect(result.data[0].title, equals('Test Notification'));
+
+      // Verify the HTTP GET was called exactly once
       verify(mockClient.get(any)).called(1);
     });
 
     test('should throw exception on 404 error', () async {
-      // Arrange
+      // Simulate server returning "Not Found" error
       when(
         mockClient.get(any),
       ).thenAnswer((_) async => http.Response('Not Found', 404));
 
-      // Act & Assert
+      // Expect the method to throw an exception with specific message
       expect(
         apiService.fetchNotification(),
         throwsA(
@@ -88,12 +95,12 @@ void main() {
     });
 
     test('should throw exception on 500 server error', () async {
-      // Arrange
+      // Simulate internal server error (backend crashed, database down, etc.)
       when(
         mockClient.get(any),
       ).thenAnswer((_) async => http.Response('Server Error', 500));
 
-      // Act & Assert
+      // Should throw user-friendly error message
       expect(
         apiService.fetchNotification(),
         throwsA(
@@ -110,12 +117,11 @@ void main() {
     });
 
     test('should throw exception on 503 service unavailable', () async {
-      // Arrange
+      // Simulate server maintenance or overload
       when(
         mockClient.get(any),
       ).thenAnswer((_) async => http.Response('Service Unavailable', 503));
 
-      // Act & Assert
       expect(
         apiService.fetchNotification(),
         throwsA(
@@ -132,10 +138,10 @@ void main() {
     });
 
     test('should throw exception on empty response body', () async {
-      // Arrange
+      // Server returns 200 OK but with no content
+      // This shouldn't happen, but we handle it gracefully
       when(mockClient.get(any)).thenAnswer((_) async => http.Response('', 200));
 
-      // Act & Assert
       expect(
         apiService.fetchNotification(),
         throwsA(
@@ -150,12 +156,12 @@ void main() {
     });
 
     test('should throw exception on timeout', () async {
-      // Arrange
+      // Simulate slow network - request takes too long
       when(
         mockClient.get(any),
       ).thenThrow(TimeoutException('Timed out', Duration(seconds: 30)));
 
-      // Act & Assert
+      // User should get helpful message about checking their connection
       expect(
         apiService.fetchNotification(),
         throwsA(
@@ -172,12 +178,11 @@ void main() {
     });
 
     test('should throw exception on no internet (SocketException)', () async {
-      // Arrange
+      // Simulate no network connection (WiFi off, airplane mode, etc.)
       when(
         mockClient.get(any),
       ).thenThrow(const SocketException('No route to host'));
 
-      // Act & Assert
       expect(
         apiService.fetchNotification(),
         throwsA(
@@ -194,13 +199,13 @@ void main() {
     });
 
     test('should throw exception on malformed JSON', () async {
-      // Arrange
+      // Server returns invalid JSON (missing bracket, wrong format)
       const malformedJson = '{"message": "Success", "data": [}';
       when(
         mockClient.get(any),
       ).thenAnswer((_) async => http.Response(malformedJson, 200));
 
-      // Act & Assert (assumes JsonParser throws FormatException)
+      // Should catch JSON parsing error and return user-friendly message
       expect(
         apiService.fetchNotification(),
         throwsA(
@@ -215,7 +220,7 @@ void main() {
     });
 
     test('should handle empty data array successfully', () async {
-      // Arrange
+      // Valid response but user has no notifications yet
       const emptyDataResponse = '''
       {
         "message": "No notifications",
@@ -226,17 +231,17 @@ void main() {
         mockClient.get(any),
       ).thenAnswer((_) async => http.Response(emptyDataResponse, 200));
 
-      // Act
       final result = await apiService.fetchNotification();
 
-      // Assert
+      // Should work fine with empty list - not an error condition
       expect(result.data, isEmpty);
       expect(result.message, equals('No notifications'));
       verify(mockClient.get(any)).called(1);
     });
 
     test('should handle large response with multiple items', () async {
-      // Arrange: Generate valid JSON without multiline issues
+      // Test with 50 notifications to ensure we can handle lots of data
+      // Build JSON programmatically to avoid multi-line string issues
       final dataItems = List.generate(
         50,
         (index) =>
@@ -248,16 +253,17 @@ void main() {
         mockClient.get(any),
       ).thenAnswer((_) async => http.Response(largeResponse, 200));
 
-      // Act
       final result = await apiService.fetchNotification();
 
-      // Assert
+      // Verify all 50 items were parsed correctly
       expect(result.data.length, equals(50));
       verify(mockClient.get(any)).called(1);
     });
   });
 
   group('ApiService Retry Mechanism Tests', () {
+    // Retry mechanism: If a request fails, automatically try again
+    // Useful for temporary network glitches or server hiccups
     late ApiService apiService;
     late MockClient mockClient;
 
@@ -281,7 +287,8 @@ void main() {
     ''';
 
     test('should retry and succeed on second attempt', () async {
-      // Arrange - First call fails (500), second succeeds
+      // Simulate: first call fails, second call succeeds
+      // This is common when servers are briefly overloaded
       final responses = [
         http.Response('Server Error', 500),
         http.Response(validJsonResponse, 200),
@@ -289,26 +296,27 @@ void main() {
       int callIndex = 0;
       when(mockClient.get(any)).thenAnswer((_) async => responses[callIndex++]);
 
-      // Act
       final result = await apiService.fetchNotificationWithRetry(
         maxRetries: 2,
-        retryDelay: const Duration(milliseconds: 1),
+        retryDelay: const Duration(
+          milliseconds: 1,
+        ), // Very short delay for testing
       );
 
-      // Assert
+      // Should succeed after retry
       expect(result, isA<NotificationModel>());
-      verify(mockClient.get(any)).called(2);
+      verify(mockClient.get(any)).called(2); // Called twice: initial + 1 retry
     });
 
     test('should fail after max retries', () async {
-      // Arrange - All attempts fail
+      // Simulate persistent failure - all attempts fail
       int callCount = 0;
       when(mockClient.get(any)).thenAnswer((_) async {
         callCount++;
         return http.Response('Server Error', 500);
       });
 
-      // Act & Assert
+      // Should eventually give up and throw exception
       expect(
         apiService.fetchNotificationWithRetry(
           maxRetries: 2,
@@ -317,14 +325,14 @@ void main() {
         throwsA(isA<Exception>()),
       );
 
-      // Wait for async to complete
+      // Give time for async operations to complete
       await Future.delayed(const Duration(milliseconds: 100));
 
-      // Verify call count manually (more reliable than mockito verify)
+      // Verify it tried exactly the number of times we specified
       expect(
         callCount,
-        equals(2),
-      ); // total 2 attempts for maxRetries=2 (initial + 1 retry)
+        equals(2), // maxRetries=2 means initial attempt + 1 retry = 2 total
+      );
     });
   });
 
@@ -332,14 +340,16 @@ void main() {
     late ApiService apiService;
 
     setUp(() {
-      apiService = ApiService(); // Uses real client
+      apiService = ApiService(); // Use real client to test actual connectivity
     });
 
     test('hasInternetConnection should return true when connected', () async {
-      // Note: Real network check; flaky in offline/CI. For full mock, add @GenerateMocks([InternetAddress]) and stub lookup static.
+      // This test checks real network connection
+      // Note: May fail in offline environments or CI/CD pipelines
+      // In production code, you might want to mock InternetAddress.lookup
       final hasConnection = await apiService.hasInternetConnection();
 
-      // Assert (weak: always bool; strengthen to expect(true) in connected env)
+      // Verify it returns a boolean (true when online, false when offline)
       expect(hasConnection, isA<bool>());
     });
   });

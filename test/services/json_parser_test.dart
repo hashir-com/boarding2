@@ -1,12 +1,19 @@
-// test/services/json_parser_test.dart
-
 /// Unit tests for JsonParser service
-/// 
+///
+/// JsonParser uses Flutter Isolates to parse JSON on a background thread.
+/// This prevents the UI from freezing when processing large JSON responses.
+///
+/// What are Isolates?
+/// - Separate threads that run code in parallel
+/// - Don't block the main UI thread
+/// - Essential for keeping apps smooth and responsive
+///
 /// These tests verify:
-/// - Isolate-based JSON parsing works correctly
-/// - Large JSON data is handled efficiently
-/// - Malformed JSON throws appropriate errors
-/// - Isolate communication works properly
+/// - ✅ Valid JSON is parsed correctly
+/// - 📦 Large datasets (50+ items) are handled efficiently
+/// - ❌ Malformed JSON throws clear errors
+/// - 🎯 Special characters (emojis, quotes, newlines) work
+/// - ⚡ Parsing completes within reasonable time limits
 
 import 'package:btask/services/json_parser.dart';
 import 'package:btask/models/notification_model.dart';
@@ -14,9 +21,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('JsonParser Isolate Tests', () {
-    
     test('should parse valid JSON string in isolate', () async {
-      // Arrange
+      // Sample JSON matching our API's response format
       const validJsonString = '''
       {
         "message": "Success",
@@ -31,10 +37,10 @@ void main() {
       }
       ''';
 
-      // Act
+      // Parse JSON on background thread (isolate)
       final result = await JsonParser.parseNotificationJson(validJsonString);
 
-      // Assert
+      // Verify all fields were parsed correctly
       expect(result, isA<NotificationModel>());
       expect(result.message, equals('Success'));
       expect(result.data.length, equals(1));
@@ -42,7 +48,7 @@ void main() {
     });
 
     test('should parse empty data array', () async {
-      // Arrange
+      // User has no notifications - valid but empty response
       const emptyDataJson = '''
       {
         "message": "No data",
@@ -50,43 +56,47 @@ void main() {
       }
       ''';
 
-      // Act
       final result = await JsonParser.parseNotificationJson(emptyDataJson);
 
-      // Assert
+      // Empty list is valid, not an error
       expect(result.data, isEmpty);
       expect(result.message, equals('No data'));
     });
 
     test('should parse large JSON with multiple items', () async {
-      // Arrange - Simulating API response with 50 notifications
-      final dataItems = List.generate(50, (index) => '''
+      // Test with 50 notifications - simulates heavy data load
+      // This is where isolates really help keep UI smooth
+      final dataItems = List.generate(
+        50,
+        (index) =>
+            '''
         {
           "image": "https://example.com/image$index.jpg",
           "title": "Notification $index",
           "body": "Body text for notification $index",
           "timestamp": "2024-11-13T10:${index.toString().padLeft(2, '0')}:00Z"
         }
-      ''').join(',');
-      
-      final largeJsonString = '''
+      ''',
+      ).join(',');
+
+      final largeJsonString =
+          '''
       {
         "message": "Success",
         "data": [$dataItems]
       }
       ''';
 
-      // Act
       final result = await JsonParser.parseNotificationJson(largeJsonString);
 
-      // Assert
+      // Verify all items were parsed without losing any data
       expect(result.data.length, equals(50));
       expect(result.data[0].title, equals('Notification 0'));
       expect(result.data[49].title, equals('Notification 49'));
     });
 
     test('should throw exception for malformed JSON', () async {
-      // Arrange
+      // Missing comma between fields - invalid JSON syntax
       const malformedJson = '''
       {
         "message": "Success",
@@ -99,7 +109,7 @@ void main() {
       }
       ''';
 
-      // Act & Assert
+      // Should catch syntax error and throw exception
       expect(
         () => JsonParser.parseNotificationJson(malformedJson),
         throwsA(isA<Exception>()),
@@ -107,25 +117,24 @@ void main() {
     });
 
     test('should throw exception for invalid JSON structure', () async {
-      // Arrange - Missing required 'data' field
+      // Missing the required 'data' field
+      // Tests graceful handling of unexpected structure
       const invalidStructure = '''
       {
         "message": "Success"
       }
       ''';
 
-      // Act
       final result = await JsonParser.parseNotificationJson(invalidStructure);
 
-      // Assert - Should handle gracefully with empty data
+      // Should handle missing field gracefully with empty array
       expect(result.data, isEmpty);
     });
 
     test('should throw exception for empty string', () async {
-      // Arrange
+      // Empty response from server - nothing to parse
       const emptyString = '';
 
-      // Act & Assert
       expect(
         () => JsonParser.parseNotificationJson(emptyString),
         throwsA(isA<Exception>()),
@@ -133,10 +142,10 @@ void main() {
     });
 
     test('should throw exception for non-JSON string', () async {
-      // Arrange
+      // Server returned plain text instead of JSON
+      // Could happen if server has error page or maintenance message
       const notJson = 'This is not JSON';
 
-      // Act & Assert
       expect(
         () => JsonParser.parseNotificationJson(notJson),
         throwsA(isA<Exception>()),
@@ -144,7 +153,8 @@ void main() {
     });
 
     test('should parse JSON with special characters', () async {
-      // Arrange
+      // Real-world data often contains special characters
+      // Test emojis, quotes, newlines, tabs, unicode
       const specialCharsJson = '''
       {
         "message": "Success",
@@ -159,16 +169,16 @@ void main() {
       }
       ''';
 
-      // Act
       final result = await JsonParser.parseNotificationJson(specialCharsJson);
 
-      // Assert
+      // Verify special characters are preserved correctly
       expect(result.data[0].title, contains('quotes'));
       expect(result.data[0].title, contains('🎉'));
     });
 
     test('should handle nested JSON structures', () async {
-      // Arrange
+      // Verify parser correctly handles the nested structure:
+      // Root object → data array → notification objects
       const nestedJson = '''
       {
         "message": "Success",
@@ -183,36 +193,43 @@ void main() {
       }
       ''';
 
-      // Act
       final result = await JsonParser.parseNotificationJson(nestedJson);
 
-      // Assert
+      // Check both outer and inner structures are correct types
       expect(result, isA<NotificationModel>());
       expect(result.data, isA<List<NotificationItem>>());
     });
 
     test('should complete parsing within reasonable time', () async {
-      // Arrange
-      final dataItems = List.generate(100, (index) => '''
+      // Performance test with 100 items
+      // Ensures isolate doesn't add too much overhead
+      final dataItems = List.generate(
+        100,
+        (index) =>
+            '''
         {
           "image": "image$index.jpg",
           "title": "Title $index",
           "body": "Body $index",
           "timestamp": "2024-11-13T10:00:00Z"
         }
-      ''').join(',');
-      
+      ''',
+      ).join(',');
+
       final jsonString = '{"message": "Success", "data": [$dataItems]}';
 
-      // Act
+      // Measure how long parsing takes
       final stopwatch = Stopwatch()..start();
       final result = await JsonParser.parseNotificationJson(jsonString);
       stopwatch.stop();
 
-      // Assert
+      // Verify all data was parsed
       expect(result.data.length, equals(100));
-      // Parsing should complete within 5 seconds even for 100 items
+
+      // Parsing 100 items should take less than 5 seconds
+      // If it takes longer, isolate communication might have issues
       expect(stopwatch.elapsedMilliseconds, lessThan(5000));
     });
   });
 }
+/// Unit tests for NotificationProvider

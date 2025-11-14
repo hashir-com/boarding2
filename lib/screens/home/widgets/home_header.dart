@@ -5,6 +5,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Header widget for the home screen
+/// Displays location, search bar, and action icons (notifications, tags)
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
 
@@ -16,7 +18,7 @@ class HomeHeader extends StatelessWidget {
       color: AppColors.background,
       child: Column(
         children: [
-          // Location Row
+          // Location section with location pin icon and dropdown indicator
           Row(
             children: [
               SvgPicture.asset(
@@ -38,6 +40,7 @@ class HomeHeader extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 8),
+              // Dropdown arrow icon
               SvgPicture.asset(
                 'assets/images/back button.svg',
                 width: 5,
@@ -53,9 +56,10 @@ class HomeHeader extends StatelessWidget {
 
           SizedBox(height: 25),
 
-          // Search Row
+          // Search bar with notification and tag icons
           Row(
             children: [
+              // Search input field
               Expanded(
                 child: TextField(
                   decoration: InputDecoration(
@@ -64,7 +68,7 @@ class HomeHeader extends StatelessWidget {
                       fontSize: 13.sp,
                       color: AppColors.primaryText.withOpacity(0.5),
                     ),
-                    // FIX: Wrap SVG in Padding widget for proper sizing
+                    // Search icon positioned at the end of input
                     suffixIcon: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: SvgPicture.asset(
@@ -96,6 +100,7 @@ class HomeHeader extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 15),
+              // Notification icon - navigates to notification screen on tap
               GestureDetector(
                 child: SvgPicture.asset(
                   'assets/images/notification.svg',
@@ -109,6 +114,7 @@ class HomeHeader extends StatelessWidget {
                 onTap: () => context.push('/notification'),
               ),
               SizedBox(width: 15),
+              // Tag/label icon
               SvgPicture.asset(
                 'assets/images/tag.svg',
                 width: 28,

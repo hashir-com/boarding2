@@ -1,7 +1,16 @@
-// test/widgets/notification_widgets_test.dart
-
-/// Minimal widget tests for notification UI components
-/// Focused on rendering and structure, not state transitions
+/// Widget tests for notification UI components
+///
+/// Widget tests verify individual UI components render correctly.
+/// Unlike integration tests (full screen), these test one widget at a time.
+///
+/// What we test:
+/// - 📱 UI components display correct data
+/// - 🎨 Widgets render without crashing
+/// - 🔄 Different states (loading, error, empty, success)
+/// - 📐 Widget structure and layout
+///
+/// We use mocks to control what data the widgets receive,
+/// making tests predictable and fast.
 
 import 'package:btask/models/notification_model.dart';
 import 'package:btask/providers/notifications_provider.dart';
@@ -20,6 +29,8 @@ import '../screens/notification_screen_test.mocks.dart';
 
 @GenerateMocks([NotificationProvider])
 void main() {
+  // Sample notification data used across multiple tests
+  // Created once and reused to keep tests DRY (Don't Repeat Yourself)
   final mockNotifications = [
     NotificationItem(
       image: 'test1.jpg',
@@ -41,6 +52,7 @@ void main() {
 
   group('NotificationAppBar Widget Tests', () {
     testWidgets('should render app bar with correct title', (tester) async {
+      // Build just the AppBar widget in a minimal app shell
       await tester.pumpWidget(
         ScreenUtilInit(
           designSize: const Size(375, 812),
@@ -49,17 +61,20 @@ void main() {
         ),
       );
 
+      // Verify the title text is displayed
       expect(find.text('Notifications'), findsOneWidget);
       expect(find.byType(AppBar), findsOneWidget);
     });
 
     testWidgets('should have correct preferred size', (tester) async {
+      // PreferredSize is important for AppBar height
       const appBar = NotificationAppBar();
       expect(appBar.preferredSize.height, greaterThan(0));
     });
   });
 
   group('NotificationBody Widget Tests', () {
+    // Mock provider to control what data the widget receives
     late MockNotificationProvider mockProvider;
 
     setUp(() {
@@ -67,6 +82,7 @@ void main() {
     });
 
     testWidgets('should show loading indicator when loading', (tester) async {
+      // Simulate loading state (data is being fetched)
       when(mockProvider.isLoading).thenReturn(true);
       when(mockProvider.errorMessage).thenReturn('');
       when(mockProvider.notifications).thenReturn([]);
@@ -83,10 +99,12 @@ void main() {
         ),
       );
 
+      // While loading, should show spinner to indicate activity
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
     testWidgets('should show error view when error occurs', (tester) async {
+      // Simulate error state (API call failed)
       when(mockProvider.isLoading).thenReturn(false);
       when(mockProvider.errorMessage).thenReturn('Network error');
       when(mockProvider.notifications).thenReturn([]);
@@ -103,12 +121,14 @@ void main() {
         ),
       );
 
+      // Should display error view with helpful message to user
       expect(find.byType(NotificationErrorView), findsOneWidget);
     });
 
     testWidgets('should show empty message when no notifications', (
       tester,
     ) async {
+      // Simulate empty state (successful API call but no data)
       when(mockProvider.isLoading).thenReturn(false);
       when(mockProvider.errorMessage).thenReturn('');
       when(mockProvider.notifications).thenReturn([]);
@@ -125,10 +145,12 @@ void main() {
         ),
       );
 
+      // Should show friendly "no data" message instead of blank screen
       expect(find.text('No notifications'), findsOneWidget);
     });
 
     testWidgets('should show list when data available', (tester) async {
+      // Simulate success state with actual notification data
       when(mockProvider.isLoading).thenReturn(false);
       when(mockProvider.errorMessage).thenReturn('');
       when(mockProvider.notifications).thenReturn(mockNotifications);
@@ -145,6 +167,7 @@ void main() {
         ),
       );
 
+      // Should render scrollable list with notification tiles
       expect(find.byType(ListView), findsOneWidget);
       expect(find.byType(NotificationTile), findsNWidgets(2));
     });
@@ -152,6 +175,7 @@ void main() {
 
   group('NotificationTile Widget Tests', () {
     testWidgets('should render notification data correctly', (tester) async {
+      // Create a notification with specific test data
       final notification = NotificationItem(
         image: 'test.jpg',
         title: 'Test Notification',
@@ -159,6 +183,7 @@ void main() {
         timestamp: DateTime.now().toIso8601String(),
       );
 
+      // List of SVG icons to cycle through for different notifications
       final svgIcons = [
         'assets/icons/notification1.svg',
         'assets/icons/notification2.svg',
@@ -179,6 +204,7 @@ void main() {
         ),
       );
 
+      // Verify all notification data is displayed
       expect(find.text('Test Notification'), findsOneWidget);
       expect(find.text('This is a test notification body'), findsOneWidget);
       expect(find.byType(ListTile), findsOneWidget);
@@ -209,6 +235,7 @@ void main() {
         ),
       );
 
+      // Verify ListTile has a leading icon (displayed on the left)
       final listTile = tester.widget<ListTile>(find.byType(ListTile));
       expect(listTile.leading, isNotNull);
     });
@@ -216,6 +243,8 @@ void main() {
     testWidgets('should handle empty notification data gracefully', (
       tester,
     ) async {
+      // Test edge case: notification with all empty fields
+      // Widget should still render without crashing
       final emptyNotification = NotificationItem(
         image: '',
         title: '',
@@ -240,6 +269,7 @@ void main() {
         ),
       );
 
+      // Should render successfully even with empty data
       expect(find.byType(ListTile), findsOneWidget);
     });
   });

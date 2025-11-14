@@ -1,12 +1,14 @@
-// test/screens/notification_screen_test.dart
-
 /// Integration tests for NotificationScreen
 ///
-/// These tests verify:
-/// - Screen initializes correctly
-/// - Provider is called on screen load
-/// - App bar and body are rendered
-/// - Complete user flow works end-to-end
+/// Integration tests verify how different parts of the app work together.
+/// Unlike unit tests (which test one piece), these tests verify:
+/// - The screen displays correctly with real widgets
+/// - Data flows properly from Provider to UI
+/// - User interactions work as expected
+/// - Screen handles different states (loading, error, success)
+///
+/// We use "mocks" (fake versions) of the provider to control what data
+/// the screen receives, making tests predictable and fast.
 
 import 'package:btask/models/notification_model.dart';
 import 'package:btask/providers/notifications_provider.dart';
@@ -22,10 +24,19 @@ import 'package:provider/provider.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 
+// Generate mock classes - Mockito creates fake versions of our classes for testing
 @GenerateMocks([NotificationProvider])
 import 'notification_screen_test.mocks.dart';
 
-// CRITICAL FIX: Create a Fake Provider that actually extends ChangeNotifier
+/// FakeNotificationProvider - A test version of NotificationProvider
+///
+/// This extends the real NotificationProvider so it can be used with Provider package.
+/// Unlike mocks, this actually calls notifyListeners() so widgets rebuild properly.
+///
+/// Why we need this:
+/// - MockNotificationProvider doesn't trigger real widget rebuilds
+/// - We need to test that UI updates when provider state changes
+/// - This fake class lets us control state AND see real widget behavior
 class FakeNotificationProvider extends NotificationProvider {
   bool _isLoading = false;
   String _errorMessage = '';
@@ -41,19 +52,23 @@ class FakeNotificationProvider extends NotificationProvider {
   @override
   List<NotificationItem> get notifications => _notifications;
 
+  // Track if fetch was called (useful for testing initialization)
   bool get fetchWasCalled => _fetchWasCalled;
 
+  /// Set loading state and notify widgets to rebuild
   void setLoading(bool value) {
     _isLoading = value;
-    notifyListeners();
+    notifyListeners(); // This is what makes widgets update
   }
 
+  /// Set error message and notify widgets
   void setError(String message) {
     _errorMessage = message;
     _isLoading = false;
     notifyListeners();
   }
 
+  /// Set notifications data and notify widgets
   void setNotifications(List<NotificationItem> items) {
     _notifications = items;
     _isLoading = false;
@@ -63,25 +78,29 @@ class FakeNotificationProvider extends NotificationProvider {
   @override
   Future<void> fetchNotifications() async {
     _fetchWasCalled = true;
-    // Don't actually fetch - just mark as called
+    // Don't actually call API - just mark that this method was called
   }
 }
 
 void main() {
   group('NotificationScreen Integration Tests', () {
+    // Mock provider - used in most tests where we just need to verify display
     late MockNotificationProvider mockProvider;
 
+    // setUp runs before each test to create a fresh mock
     setUp(() {
       mockProvider = MockNotificationProvider();
     });
 
     testWidgets('should render app bar and body', (tester) async {
-      // Arrange
+      // Set up what the mock provider should return when asked for data
       when(mockProvider.isLoading).thenReturn(false);
       when(mockProvider.errorMessage).thenReturn('');
       when(mockProvider.notifications).thenReturn([]);
 
-      // Act
+      // Build the widget tree with our screen
+      // ScreenUtilInit handles responsive sizing
+      // ChangeNotifierProvider provides the mock to the screen
       await tester.pumpWidget(
         ScreenUtilInit(
           designSize: const Size(375, 812),
@@ -94,20 +113,20 @@ void main() {
         ),
       );
 
-      // Assert
+      // Verify the screen has the expected structure
       expect(find.byType(NotificationAppBar), findsOneWidget);
       expect(find.byType(NotificationBody), findsOneWidget);
       expect(find.byType(Scaffold), findsOneWidget);
     });
 
     testWidgets('should fetch notifications on init', (tester) async {
-      // Arrange
+      // Set up mock responses
       when(mockProvider.isLoading).thenReturn(false);
       when(mockProvider.errorMessage).thenReturn('');
       when(mockProvider.notifications).thenReturn([]);
       when(mockProvider.fetchNotifications()).thenAnswer((_) async {});
 
-      // Act
+      // Render the screen
       await tester.pumpWidget(
         ScreenUtilInit(
           designSize: const Size(375, 812),
@@ -120,17 +139,17 @@ void main() {
         ),
       );
 
-      // Assert
+      // Verify fetchNotifications was called exactly once when screen loaded
+      // This ensures data is fetched automatically when user opens the screen
       verify(mockProvider.fetchNotifications()).called(1);
     });
 
     testWidgets('should display loading state initially', (tester) async {
-      // Arrange
+      // Simulate the loading state (data is being fetched)
       when(mockProvider.isLoading).thenReturn(true);
       when(mockProvider.errorMessage).thenReturn('');
       when(mockProvider.notifications).thenReturn([]);
 
-      // Act
       await tester.pumpWidget(
         ScreenUtilInit(
           designSize: const Size(375, 812),
@@ -143,12 +162,12 @@ void main() {
         ),
       );
 
-      // Assert
+      // When loading, screen should show a circular progress indicator
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
     testWidgets('should display notifications after loading', (tester) async {
-      // Arrange
+      // Create fake notification data to display
       final mockNotifications = [
         NotificationItem(
           image: 'test1.jpg',
@@ -164,11 +183,11 @@ void main() {
         ),
       ];
 
+      // Simulate successful data load
       when(mockProvider.isLoading).thenReturn(false);
       when(mockProvider.errorMessage).thenReturn('');
       when(mockProvider.notifications).thenReturn(mockNotifications);
 
-      // Act
       await tester.pumpWidget(
         ScreenUtilInit(
           designSize: const Size(375, 812),
@@ -181,7 +200,7 @@ void main() {
         ),
       );
 
-      // Assert
+      // Verify both notifications are displayed on screen
       expect(find.text('Notification 1'), findsOneWidget);
       expect(find.text('Notification 2'), findsOneWidget);
       expect(find.text('Body 1'), findsOneWidget);
@@ -189,12 +208,11 @@ void main() {
     });
 
     testWidgets('should display error state when fetch fails', (tester) async {
-      // Arrange
+      // Simulate an error scenario (network failure, server error, etc.)
       when(mockProvider.isLoading).thenReturn(false);
       when(mockProvider.errorMessage).thenReturn('Network error occurred');
       when(mockProvider.notifications).thenReturn([]);
 
-      // Act
       await tester.pumpWidget(
         ScreenUtilInit(
           designSize: const Size(375, 812),
@@ -207,19 +225,18 @@ void main() {
         ),
       );
 
-      // Assert
+      // When there's an error, screen should show error view to the user
       expect(find.byType(NotificationErrorView), findsOneWidget);
     });
 
     testWidgets('should display empty state when no notifications', (
       tester,
     ) async {
-      // Arrange
+      // Simulate successful load but with no notifications
       when(mockProvider.isLoading).thenReturn(false);
       when(mockProvider.errorMessage).thenReturn('');
       when(mockProvider.notifications).thenReturn([]);
 
-      // Act
       await tester.pumpWidget(
         ScreenUtilInit(
           designSize: const Size(375, 812),
@@ -232,12 +249,12 @@ void main() {
         ),
       );
 
-      // Assert
+      // Should show a friendly "no notifications" message
       expect(find.text('No notifications'), findsOneWidget);
     });
 
     testWidgets('should be scrollable when many notifications', (tester) async {
-      // Arrange
+      // Generate 20 notifications to test scrolling behavior
       final manyNotifications = List.generate(
         20,
         (index) => NotificationItem(
@@ -252,7 +269,6 @@ void main() {
       when(mockProvider.errorMessage).thenReturn('');
       when(mockProvider.notifications).thenReturn(manyNotifications);
 
-      // Act
       await tester.pumpWidget(
         ScreenUtilInit(
           designSize: const Size(375, 812),
@@ -265,22 +281,23 @@ void main() {
         ),
       );
 
-      // Assert - Should find ListView
+      // Should use ListView for scrollable list
       expect(find.byType(ListView), findsOneWidget);
 
-      // Verify scrolling works
+      // Test actual scrolling - drag list up by 500 pixels
       final listFinder = find.byType(ListView);
       await tester.drag(listFinder, const Offset(0, -500));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(); // Wait for scroll animation to complete
 
-      // Should still be on screen after scroll
+      // Screen should still be present after scrolling (didn't crash)
       expect(find.byType(NotificationScreen), findsOneWidget);
     });
   });
 
   group('NotificationScreen State Management', () {
     testWidgets('should update UI when provider state changes', (tester) async {
-      // FIXED: Use FakeNotificationProvider that actually extends ChangeNotifier
+      // Use FakeProvider here because we need real notifyListeners() behavior
+      // MockProvider doesn't actually trigger widget rebuilds
       final fakeProvider = FakeNotificationProvider();
 
       final notifications = [
@@ -292,7 +309,7 @@ void main() {
         ),
       ];
 
-      // Start with loading state
+      // Start in loading state
       fakeProvider.setLoading(true);
 
       await tester.pumpWidget(
@@ -307,16 +324,16 @@ void main() {
         ),
       );
 
-      // Verify loading state
+      // Confirm loading indicator is shown
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      // Change to loaded state - this WILL trigger notifyListeners()
+      // Change state to loaded - this triggers notifyListeners()
       fakeProvider.setNotifications(notifications);
 
-      // Wait for the UI to rebuild
+      // Wait for widgets to rebuild
       await tester.pump();
 
-      // Assert - No more loading, data is shown
+      // Verify UI updated: loading is gone, notification is shown
       expect(find.byType(CircularProgressIndicator), findsNothing);
       expect(find.text('New Notification'), findsOneWidget);
     });
@@ -326,6 +343,7 @@ void main() {
     ) async {
       final fakeProvider = FakeNotificationProvider();
 
+      // Create 30 notifications to enable scrolling
       final notifications = List.generate(
         30,
         (index) => NotificationItem(
@@ -350,16 +368,16 @@ void main() {
         ),
       );
 
-      // Scroll down
+      // Scroll down the list
       final listFinder = find.byType(ListView);
       await tester.drag(listFinder, const Offset(0, -300));
       await tester.pumpAndSettle();
 
-      // Act - Update data (trigger rebuild)
+      // Trigger a state update (simulates new data arriving)
       fakeProvider.setNotifications(notifications);
       await tester.pump();
 
-      // Assert - List should still be rendered
+      // List should still be rendered and functional after update
       expect(find.byType(ListView), findsOneWidget);
     });
   });
@@ -372,7 +390,7 @@ void main() {
     });
 
     testWidgets('should handle tap on notification item', (tester) async {
-      // Arrange
+      // Create a notification that user can tap on
       final notification = NotificationItem(
         image: 'test.jpg',
         title: 'Tappable Notification',
@@ -396,13 +414,13 @@ void main() {
         ),
       );
 
-      // Act - Tap on notification
+      // Find and tap the notification tile
       final tileFinder = find.byType(NotificationTile);
       expect(tileFinder, findsOneWidget);
       await tester.tap(tileFinder);
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(); // Wait for any animations
 
-      // Assert - Should not crash
+      // App should not crash when notification is tapped
       expect(find.byType(NotificationScreen), findsOneWidget);
     });
   });
@@ -415,7 +433,7 @@ void main() {
     });
 
     testWidgets('should render large list efficiently', (tester) async {
-      // Arrange
+      // Create a very large list (100 items) to test performance
       final largeList = List.generate(
         100,
         (index) => NotificationItem(
@@ -430,7 +448,7 @@ void main() {
       when(mockProvider.errorMessage).thenReturn('');
       when(mockProvider.notifications).thenReturn(largeList);
 
-      // Act
+      // Measure how long it takes to render
       final stopwatch = Stopwatch()..start();
 
       await tester.pumpWidget(
@@ -445,10 +463,11 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(); // Wait for all rendering to complete
       stopwatch.stop();
 
-      // Assert - Should render within reasonable time (< 3 seconds)
+      // Screen should render within 3 seconds even with 100 items
+      // This ensures app stays responsive with large datasets
       expect(stopwatch.elapsedMilliseconds, lessThan(3000));
       expect(find.byType(ListView), findsOneWidget);
     });

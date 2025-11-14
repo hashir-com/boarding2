@@ -1,9 +1,13 @@
+/// Model class for the notification API response
+/// Contains a message and a list of notification items
 class NotificationModel {
   final String message;
   final List<NotificationItem> data;
 
   NotificationModel({required this.message, required this.data});
 
+  /// Creates a NotificationModel instance from JSON
+  /// Safely handles null values with default empty values
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
       message: json['message'] ?? '',
@@ -14,6 +18,8 @@ class NotificationModel {
     );
   }
 
+  /// Converts the model back to JSON format
+  /// Useful for caching or sending data back to the API
   Map<String, dynamic> toJson() {
     return {
       'message': message,
@@ -22,6 +28,8 @@ class NotificationModel {
   }
 }
 
+/// Model class representing a single notification item
+/// Contains all details needed to display a notification in the UI
 class NotificationItem {
   final String image;
   final String title;
@@ -35,21 +43,25 @@ class NotificationItem {
     required this.timestamp,
   });
 
+  /// Creates a NotificationItem from JSON response
+  /// Maps API field names to model properties with null safety
   factory NotificationItem.fromJson(Map<String, dynamic> json) {
     return NotificationItem(
       image: json['image'] ?? '',
       title: json['title'] ?? '',
-      body: json['body'] ?? '', // API uses 'body', not 'description'
-      timestamp: json['timestamp'] ?? '', // API uses 'timestamp', not 'time'
+      body: json['body'] ?? '',
+      timestamp: json['timestamp'] ?? '',
     );
   }
 
+  /// Converts the notification item to JSON format
+  /// Maintains consistency with API field naming
   Map<String, dynamic> toJson() {
     return {
       'image': image,
       'title': title,
-      'body': body, // Convert back to API format
-      'timestamp': timestamp, // Convert back to API format
+      'body': body,
+      'timestamp': timestamp,
     };
   }
 }
